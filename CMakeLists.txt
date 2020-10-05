@@ -34,7 +34,7 @@ set(SRC_DIR ${PROJECT_SOURCE_DIR}/)
 include_directories(${SRC_DIR})
 
 set(SRC
-    ${SRC_DIR}/queens.cpp
+    ${SRC_DIR}test.cpp
     )
 
 # RELEASE build
