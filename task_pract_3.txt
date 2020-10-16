@@ -1,0 +1,167 @@
+Выбор оптимального сервера сканирования угроз
+
+
+Описание:
+В многопоточной среде существует огромное множество клиентов, которым необходимо выполнить сканирования угроз на удаленном сервере. Серверов также великое множество. Многие из серверов загружены, так как уже обслуживают достаточно большое количество клиентов, обрабатывая запросы на сканирование угроз. Решая задачу выбора оптимального сервера сканирования, придумали несколько алгоритмов. Сервера наделили параметрами с помощью которых возможно принять оптимальное решение - количеством клиентов, тэгами (чтобы распределить сервера и клиентов на группы), расположением относительно клиентов. Но оказалось, что процесс выбора достаточно ресурсоемкий - было решено делегировать его некому фасаду, через который возможно было бы получать информацию об оптимальном сервере.
+
+Необходимо реализовать компонент ServerProvider. ServerProvider отвечает за выбор оптимального сервера сканирования и обрабатывает запросы от клиентов, возвращая адрес выбранного сервера сканирования.
+
+Схему взаимодействия можно представить следующим образом:
+
+
+
+Множество клиентов запрашивают у ServerProvider адрес сервера сканирования.
+
+
+
+ServerProvider при выборе сервера использует один из алгоритмов выбора и, самое важное, список серверов сканирования. Все параметры ServerProvider получает с настройками от администраторов системы. Стоит учесть, что изменение или запрос текущих настроек может произойти в любое время, параллельно с процессом выбора или запроса информации об оптимальном сервере.
+
+
+
+Условия:
+Необходимо учесть, что компонент ServerProvider работает в многопоточной среде. Вызов любого метода может произойти параллельно с любым другим. Особое внимание уделить синхронизации для обеспечения валидного доступа к данным. Реализация компонента должна гарантировать безопасный выход из приложения (освобождение ресурсов, завершение потока и т.д).
+
+ServerProvider реализует следующие интерфейсы: IServerProvider и IServerProviderSettings. Интерфейсы предполагают использование обработки ошибок через коды возврата (не через проброс исключений) - каждый метод интерфейса возвращает один из элементов enum ResultCode в зависимости от результата.
+
+В настройках ServerProvider передается тип используемого алгоритма (searchMode) и параметры алгоритмов (localSearchSettings, smartSearchSettings) - изменение настроек приводит к изменению используемого алгоритма выбора. ServerProvider в момент инициализации запускает поток и с интервалом 30 секунд производит выбор оптимального сервера, учитывая текущие настройки. Использование потока - обязательное условие. Запускать процесс выбора в вызове GetRemoteServiceAddress от клиента к ServerProvider нельзя, так как процесс выбора может занимать достаточно продолжительное время, что привело бы к ожиданиям на стороне клиента.
+
+Алгоритмов выбор сервера два: Local и Smart.
+
+Вход и выход алгоритмов идентичен:
+
+На вход подается текущий сервер (либо структура с пустым адресом, как признак отсутствия текущего сервера) и список серверов сканирования (servers);
+На выходе алгоритм отдает выбранный сервер (может совпадать с текущим, если текущий сервер все еще является оптимальным) и результат выбора (успех, либо ошибка - в случае возврата ошибки на выходе алгоритма - ServerProvider считает, что сервер в данный момент недоступен);
+Алгоритм Local: выполняется поиск сервера с наименьшим количеством подключенных клиентов (поле clients) и с полем AreaLevel равному City. Если серверов с полем AreaLevel равному City нет - поиск выполняется по всему списку серверов. Если на вход передается текущий сервер, и оптимальный сервер (выбранный алгоритмом) не равен текущему - на выход алгоритма отдается либо текущий сервер, либо оптимальный (новый), в случае если разница в количестве клиентов больше определенного порога (diffInClients).
+
+Алгоритм Smart: выполняется поиск сервера с наименьшим количеством подключенных клиентов (поле clients), подходящими тэгами (tag сервера совпадает с одним из тэгов ServerProvider (tags)), а также с полем AreaLevel не превосходящему ограничение по AreaLevel (areaLevelRestriction). Если серверов подходящих под ограничения по тэгам либо AreaLevel нет - возвращается ошибка. Если на вход передается текущий сервер, и оптимальный сервер (выбранный) не равен текущему - на выход алгоритма отдается либо текущий сервер, либо оптимальный (новый), в случае если разница разница в количестве клиентов текущего и выбранного более определенного процента (diffInClientsPercents) от общей нагрузки всех подходящих под ограничения серверов.
+
+
+
+Формат решения:
+В качестве решения необходимо прислать код - реализацию компонентов. Код должен успешно компилироваться, например в MSVS. Основной метод может выглядеть, примерно, так (будет отлично, но не обязательно, если в основном методе будут использованы потоки, чтобы протестировать собственный код в многопоточной среде):
+
+main...
+{
+    ServerProvider serverProvider;
+    ...
+    ServerProviderSettings settings;
+    std::vector<RemoteService> servers = { "3000, City, "", "10.70.140.80"", "0, Country, "", "10.70.140.81"", ... };
+    settings.servers = servers;
+    serverProvider.SetSettings(settings);
+    ...
+    serverProvider.GetRemoteServiceAddress(...);
+    ...
+    ServerProviderSettings settings;
+    settings.searchMode = Smart;
+    settings.areaLevel = Country;
+    ...
+    serverProvider.GetRemoteServiceAddress(...);
+...
+
+
+Контракты:
+namespace remote
+{
+enum ResultCode
+{
+    Ok = 0,
+    Fail,
+    Undefined
+};
+
+struct IServerProvider
+{
+    // address (out):
+    //   Address of current scan server (choosen by last iteration of algorithm call)
+    // return:
+    //   Ok on success
+    //   Fail in case of any errors
+    //   Undefined in case of current scan server is undefined (there was no optimal server by last last iteration of algorithm call)
+    virtual ResultCode GetRemoteServiceAddress(std::string& address) = 0;
+};
+
+const uint32_t DiffInClientsDefaultForLocal = 50;
+struct LocalSearchSettings
+{
+    uint32_t diffInClients;
+
+    LocalSearchSettings()
+        : diffInClients(DiffInClientsDefaultForLocal) {}
+};
+
+enum AreaLevel
+{
+    City = 0,
+    Country,
+    Area,
+    None
+};
+
+const uint32_t DiffInClientsDefaultForSmartPercents = 20;
+struct SmartSearchSettings
+{
+    uint32_t diffInClientsPercents;
+
+    // Set of tags with delimer equal to #
+    // Example: "tag0#tag1#tag2"
+	std::string tags;
+
+    AreaLevel areaLevelRestriction;
+
+    SmartSearchSettings()
+        : diffInClientsPercents(DiffInClientsDefaultForSmartPercents)
+        , areaLevelRestriction(None) {}
+};
+
+// Information about one of scan servers, one of an item in "std::vector<RemoteService> servers" collection,
+// passed by an admin to ServerProvider via IServerProviderSettings
+struct RemoteService
+{
+    uint32_t clients;
+
+    AreaLevel areaLevel;
+
+    std::string tag;
+
+    std::string address;
+
+    RemoteService()
+        : clients(0)
+        , areaLevel(None) {}
+};
+
+enum SearchMode
+{
+    Local = 0,
+    Smart
+};
+struct ServerProviderSettings
+{
+    // Scan server addresses colletion to choose optimal from.
+    // Initialy empty, sets by an admin.
+    std::vector<RemoteService> servers;
+
+    // One of two algorithm to use for choose of scan server
+    SearchMode searchMode;
+
+    LocalSearchSettings localSearchSettings;
+    SmartSearchSettings smartSearchSettings;
+
+    ServerProviderSettings()
+        : searchMode(Local) {}
+};
+
+struct IServerProviderSettings
+{
+    // settings (in)
+    // return:
+    //   Ok on success
+    //   Fail in case of any errors
+    virtual uint32_t SetSettings(const ServerProviderSettings* settings) = 0;
+    // settings (out)
+    // return:
+    //   Ok on success
+    //   Fail in case of any errors
+    virtual uint32_t GetSettings(ServerProviderSettings* settings) = 0;
+};
+} // namespace remote
