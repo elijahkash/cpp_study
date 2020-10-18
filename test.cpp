@@ -1,4 +1,144 @@
-#include <iostream>
+
+
+
+
+// yandex cup test round task1
+/*
+ A. Лотерейный билет
+Ограничение времени	1 секунда
+Ограничение памяти	512Mb
+Ввод	стандартный ввод или input.txt
+Вывод	стандартный вывод или output.txt
+Решение, проходящее все тесты, будет оценено в 1 балл.
+
+На различных мероприятиях команда стажировок регулярно разыгрывает призы в лотерею.
+Организаторы выбирают
+1
+0
+ случайных различных чисел от
+1
+ до
+3
+2
+. Каждому участнику выдается лотерейный билет, на котором записаны
+6
+ различных чисел от
+1
+ до
+3
+2
+. Билет считается выигрышным, если в нем есть не менее
+3
+ выбранных организаторами числа.
+Помогите Юле, напишите программу, которая будет сообщать, какие билеты выигрышные.
+
+Формат ввода
+В первой строке входных данных записаны
+1
+0
+ различных целых чисел
+a
+i
+ (
+1
+≤
+a
+i
+≤
+3
+2
+) — выбранные организаторами числа.
+Во второй строке записано одно целое число
+n
+ (
+1
+≤
+n
+≤
+1
+0
+0
+0
+) — количество лотерейных билетов, выданных на мероприятии.
+В каждой из
+n
+ последующих строк записаны
+6
+ различных целых чисел
+b
+j
+ (
+1
+≤
+b
+j
+≤
+3
+2
+) — числа, записанные на очередном лотерейном билета.
+
+Формат вывода
+Выведите
+n
+ строк. Для каждого лотерейного билета в порядке следования во входных данных выведите строку Lucky, если билет выигрышный, иначе выведите Unlucky.
+Пример
+Ввод	Вывод
+1 2 3 4 5 6 7 8 9 32
+3
+1 2 10 11 12 13
+1 2 3 10 11 12
+32 1 10 20 30 3
+Unlucky
+Lucky
+Lucky
+
+ */
+/*#include <iostream>
+#include <set>
+#include <vector>
+
+bool check(std::vector<int>& ticket, std::set<int>& winNumbers) {
+  int count = 0;
+  for (auto& nbr: ticket) {
+    if (winNumbers.find(nbr) != winNumbers.end())
+      count++;
+  }
+  return (count >= 3);
+}
+
+int main() {
+  // std::vector<int> winNumbers;
+  std::set<int> winNumbers;
+  std::vector<std::vector<int>> tickets;
+  for (int i = 0; i < 10; i++) {
+    int input;
+    std::cin >> input;
+    // winNumbers.push_back(input);
+    winNumbers.emplace(input);
+  }
+  int count;
+  std::cin >> count;
+  for (int i = 0; i < count; i++) {
+    tickets.emplace_back();
+    for (int j = 0; j < 6; j++) {
+      int tmp;
+      std::cin >> tmp;
+      tickets[i].emplace_back(tmp);
+    }
+  }
+
+  for (auto& ticket: tickets) {
+    if (check(ticket, winNumbers))
+      std::cout << "Lucky" << std::endl;
+    else
+      std::cout << "Unlucky" << std::endl;
+  }
+
+  return 0;
+}*/
+
+
+/*#include <iostream>
 #include <vector>
 #include <algorithm>
 
@@ -158,7 +298,7 @@ int main() {
   }
 
   return 0;
-}
+}*/
 
 
 
