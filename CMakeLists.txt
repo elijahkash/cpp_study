@@ -34,19 +34,19 @@ set(SRC_DIR ${PROJECT_SOURCE_DIR}/)
 include_directories(${SRC_DIR})
 
 set(SRC
-    ${SRC_DIR}test.cpp
+    ${SRC_DIR}hello.cpp
     )
 
 # RELEASE build
 # for develop exclude from default build!
-add_executable(cpp_study EXCLUDE_FROM_ALL ${SRC})
-target_compile_options(cpp_study PRIVATE ${RELEASE_FLAGS})
+add_executable(hello EXCLUDE_FROM_ALL ${SRC})
+target_compile_options(hello PRIVATE ${RELEASE_FLAGS})
 #target_link_libraries(cpp_study PRIVATE Qt5::Widgets)
 #target_link_libraries(cpp_study PRIVATE Threads::Threads)
 
 # DEBUG build
-add_executable(cpp_study_debug ${SRC})
-target_compile_options(cpp_study_debug PRIVATE ${DEBUG_FLAGS})
+add_executable(hello_debug ${SRC})
+target_compile_options(hello_debug PRIVATE ${DEBUG_FLAGS})
 #target_link_libraries(3DEngine_debug PRIVATE Qt5::Widgets)
 #target_link_libraries(3DEngine_debug PRIVATE Threads::Threads)
 #target_link_libraries(3DEngine_debug PRIVATE SDL2)
