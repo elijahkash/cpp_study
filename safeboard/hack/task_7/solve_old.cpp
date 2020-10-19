@@ -6,7 +6,7 @@
 #include <map>
 #include <sstream>
 
-#include "error.hpp"
+#include "wrap_error.hpp"
 
 
 // This is dirty hack. But a have some real problems in general (I'm work from

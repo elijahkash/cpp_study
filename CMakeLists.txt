@@ -39,7 +39,9 @@ include_directories(${SRC_DIR})
 
 set(SRC
 #    ${SRC_DIR}hello.cpp
-    ${SRC_DIR}/safeboard/hack/task_7/solve.cpp
+#    ${SRC_DIR}/safeboard/hack/task_7/solve.cpp
+    ${SRC_DIR}/safeboard/hack/task_9/server_provider.cpp
+    ${SRC_DIR}/safeboard/hack/task_9/test.cpp
     )
 
 # RELEASE build

@@ -5,19 +5,17 @@
 #include <string>
 #include <vector>
 
-namespace remote
-{
-enum ResultCode
-{
+namespace remote {
+
+enum ResultCode {
   Ok = 0,
   Fail,
   Undefined
 };
 
-struct IServerProvider
-{
+struct IServerProvider {
   // address (out):
-  //   Address of current scan server (choosen by last iteration of algorithm call)
+  //   Address of current scan server (chosen by last iteration of algorithm call)
   // return:
   //   Ok on success
   //   Fail in case of any errors
@@ -26,16 +24,15 @@ struct IServerProvider
 };
 
 const uint32_t DiffInClientsDefaultForLocal = 50;
-struct LocalSearchSettings
-{
+
+struct LocalSearchSettings {
   uint32_t diffInClients;
 
   LocalSearchSettings()
       : diffInClients(DiffInClientsDefaultForLocal) {}
 };
 
-enum AreaLevel
-{
+enum AreaLevel {
   City = 0,
   Country,
   Area,
@@ -43,11 +40,11 @@ enum AreaLevel
 };
 
 const uint32_t DiffInClientsDefaultForSmartPercents = 20;
-struct SmartSearchSettings
-{
+
+struct SmartSearchSettings {
   uint32_t diffInClientsPercents;
 
-  // Set of tags with delimer equal to #
+  // Set of tags with delimiter equal to #
   // Example: "tag0#tag1#tag2"
   std::string tags;
 
@@ -60,8 +57,7 @@ struct SmartSearchSettings
 
 // Information about one of scan servers, one of an item in "std::vector<RemoteService> servers" collection,
 // passed by an admin to ServerProvider via IServerProviderSettings
-struct RemoteService
-{
+struct RemoteService {
   uint32_t clients;
 
   AreaLevel areaLevel;
@@ -73,17 +69,23 @@ struct RemoteService
   RemoteService()
       : clients(0)
       , areaLevel(None) {}
+
+  RemoteService(uint32_t clients, AreaLevel area_level,
+                std::string tag, std::string address)
+      : clients(clients)
+      , areaLevel(area_level)
+      , tag(tag)
+      , address(address) {}
 };
 
-enum SearchMode
-{
+enum SearchMode {
   Local = 0,
   Smart
 };
-struct ServerProviderSettings
-{
-  // Scan server addresses colletion to choose optimal from.
-  // Initialy empty, sets by an admin.
+
+struct ServerProviderSettings {
+  // Scan server addresses collection to choose optimal from.
+  // Initially empty, sets by an admin.
   std::vector<RemoteService> servers;
 
   // One of two algorithm to use for choose of scan server
@@ -96,8 +98,7 @@ struct ServerProviderSettings
       : searchMode(Local) {}
 };
 
-struct IServerProviderSettings
-{
+struct IServerProviderSettings {
   // settings (in)
   // return:
   //   Ok on success
@@ -109,6 +110,7 @@ struct IServerProviderSettings
   //   Fail in case of any errors
   virtual uint32_t GetSettings(ServerProviderSettings* settings) = 0;
 };
-} // namespace remote
+
+}  // namespace remote
 
 #endif  // SAFEBOARD_HACK_TASK_9_CONTRACTS_HPP_

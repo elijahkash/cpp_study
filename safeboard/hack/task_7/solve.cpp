@@ -6,7 +6,7 @@
 #include <map>
 #include <sstream>
 
-#include "error.hpp"
+#include "wrap_error.hpp"
 
 using namespace std;
 struct Requester
