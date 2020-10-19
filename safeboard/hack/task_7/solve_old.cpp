@@ -8,6 +8,12 @@
 
 #include "error.hpp"
 
+
+// This is dirty hack. But a have some real problems in general (I'm work from
+// School21 iMac, and for a reason of technical issues a start solved tasks
+// after an hour (14:15). So just real hurry!
+std::string err;
+
 using namespace std;
 struct Requester
 {
@@ -24,7 +30,7 @@ struct RequestFromConfig
 
 enum class RequestType
 {
-  Drop, Apply, Validate
+  Drop, Apply, Validate, Error
 };
 
 struct Request
@@ -33,34 +39,33 @@ struct Request
   uint64_t ownerId;
 };
 
-WrapError<RequestType> GetRequestType(const RequestFromConfig& request) noexcept
+RequestType GetRequestType(const RequestFromConfig& request) noexcept
 {
   if (request.type == "drop")
-    return WrapError<RequestType>(RequestType::Drop);
-    // if doesn't mark WrapError(T& val) as explicit:
-    // return RequestType::Drop;
+    return RequestType::Drop;
   if (request.type == "apply")
-    return WrapError<RequestType>(RequestType::Apply);
+    return RequestType::Apply;
   if (request.type == "validate")
-    return WrapError<RequestType>(RequestType::Validate);
-  return WrapError<RequestType>(string("unknown type '") + request.type + "'");
-  // throw runtime_error(string("unknown type '") + request.type + "'");
+    return RequestType::Validate;
+  err = string("unknown type '") + request.type + "'";
+  return RequestType::Error;
 }
 
-WrapError<Request> BuildRequest(const vector<Requester>& availableRequesters, const RequestFromConfig& requestFromConfig) noexcept
+Request BuildRequest(const vector<Requester>& availableRequesters, const RequestFromConfig& requestFromConfig) noexcept
 {
+
   Request request;
   auto it = find_if(begin(availableRequesters), end(availableRequesters), [&](const Requester& requester)
   {return requester.name == requestFromConfig.requester; });
-  if (it == end(availableRequesters))
-    return WrapError<Request>(string("unknown requester '") + requestFromConfig.requester + "'");
-    // throw runtime_error(string("unknown requester '") + requestFromConfig.requester + "'");
-  auto tmp = GetRequestType(requestFromConfig);
-  if (tmp.hasError())
-    return WrapError<Request>(std::move(tmp.getErrors()));
-  request.type = tmp();
+  if (it == end(availableRequesters)) {
+    request.ownerId = 0;
+    request.type = RequestType::Error;
+    err = string("unknown requester '") + requestFromConfig.requester + "'";
+    return request;
+  }
+  request.type = GetRequestType(requestFromConfig);
   request.ownerId = it->ownerId;
-  return WrapError<Request>(request);
+  return request;
 
 }
 
@@ -70,75 +75,46 @@ struct Queue
   vector<Request> requests;
 };
 
-WrapError<Queue> BuildRequestQueue(const vector<Requester>& availableRequesters, const vector<RequestFromConfig>& requests) noexcept
+Queue BuildRequestQueue(const vector<Requester>& availableRequesters, const vector<RequestFromConfig>& requests) noexcept
 {
   static uint32_t nextId = 0;
   nextId++;
-  // try
-  // {
+
   Queue result;
   result.id = nextId;
   for (const auto& requestFromConfig : requests) {
-    auto tmp = BuildRequest(availableRequesters, requestFromConfig);
-    if (tmp.hasError()) {
+    auto res = BuildRequest(availableRequesters, requestFromConfig);
+    if (not res.ownerId or res.type == RequestType::Error) {
       ostringstream message("");
-      message << "can't build request queue #" << nextId;
-      return WrapError<Queue>(message.str(), std::move(tmp.getErrors()));
+      message << "can't build request queue #" << nextId << '\n' << " because: ";
+      err = message.str() + err;
+      result.id = 0;
+      return result;
     }
-    result.requests.push_back(tmp());
+    result.requests.push_back(res);
   }
-  return WrapError<Queue>(result);
-  // }
+  return result;
 
-  // catch (...)
-  // {
-  //   ostringstream message("");
-  //   message << "can't build request queue #" << nextId;
-  //   std::throw_with_nested(std::runtime_error(message.str()));
-  // }
 }
 
-// void print_exception(const std::exception& e, int level = 0)
-// {
-//   cout << string(level, ' ') << (level ? "because: " : "high-level operation failed: ") << e.what() << '\n';
-//   try
-//   {
-//     std::rethrow_if_nested(e);
-//   }
-//   catch (const std::exception& e)
-//   {
-//     print_exception(e, level + 1);
-//   }
-//   catch (...) {}
-// }
-
-void print_exception(std::list<std::string>&& errors) noexcept {
-  int i = 0;
-  for (const auto& error : errors) {
-    cout << string(i, ' ')
-         << (i ? "because: " : "high-level operation failed: ")
-         << error
-         << '\n';
-    i++;
-  }
+// void print_exception(const std::exception& e, int level = 0) noexcept
+void print_exception() noexcept
+{
+  std::cout << "high-level operation failed: " << err;
 }
 
 
 void PrintTaskResult(const vector<Requester>& availableRequesters, const vector<RequestFromConfig>& requests) noexcept
 {
-  // try
-  // {
+  err = "";
   auto queue = BuildRequestQueue(availableRequesters, requests);
-  if (queue.hasError())
-    print_exception(std::move(queue.getErrors()));
-  else
-    for (const auto& request : queue().requests)
-      cout << "request in queue #" << queue().id << ": " << static_cast<int>(request.type) << " / " << request.ownerId << endl;
-  // }
-  // catch (const std::exception& ex)
-  // {
-  //   print_exception(ex);
-  // }
+  if (not queue.id) {
+    print_exception();
+    cout << endl << endl;
+    return;
+  }
+  for (const auto& request : queue.requests)
+    cout << "request in queue #" << queue.id << ": " << static_cast<int>(request.type) << " / " << request.ownerId << endl;
   cout << endl << endl;
 }
 

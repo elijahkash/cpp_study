@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
+#set(CMAKE_VERBOSE_MAKEFILE on)
+
 project(cpp_study LANGUAGES C CXX)
+
+#set(CMAKE_CXX_COMPILER g++-10)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
@@ -34,7 +38,8 @@ set(SRC_DIR ${PROJECT_SOURCE_DIR}/)
 include_directories(${SRC_DIR})
 
 set(SRC
-    ${SRC_DIR}hello.cpp
+#    ${SRC_DIR}hello.cpp
+    ${SRC_DIR}/safeboard/hack/task_7/solve.cpp
     )
 
 # RELEASE build
