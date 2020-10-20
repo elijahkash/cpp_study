@@ -19,9 +19,11 @@ class ServerProvider : public IServerProvider, public IServerProviderSettings {
   uint32_t SetSettings(const ServerProviderSettings* settings) override;
   uint32_t GetSettings(ServerProviderSettings* settings) override;
 
-  ResultCode status() const;
+  ResultCode status();
 
  private:
+  // TODO: set appropriate times!
+  constexpr static std::chrono::milliseconds chooseOptimalTime{50};
   constexpr static std::chrono::milliseconds checkTime{50};
   constexpr static std::chrono::seconds updateTime{30};
 

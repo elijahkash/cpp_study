@@ -37,6 +37,7 @@ ResultCode ServerProvider::GetRemoteServiceAddress(std::string& address) {
       address = *optimal;
       return Ok;
     }
+    address.clear();
     return Undefined;
   }
   catch (...) {
@@ -52,7 +53,7 @@ uint32_t ServerProvider::SetSettings(const ServerProviderSettings *newSettings) 
     std::lock_guard<std::mutex> lock(accessMutex);
     settings = *newSettings;
     changeSettings.store(true);
-    optimal.reset();
+    // optimal.reset();
   }
   catch (...) {
     fail.store(true);
@@ -75,12 +76,11 @@ uint32_t ServerProvider::GetSettings(ServerProviderSettings *dstSettings) {
   return Ok;
 }
 
-ResultCode ServerProvider::status() const {
+ResultCode ServerProvider::status() {
   if (fail.load())
     return Fail;
-  if (optimal.has_value())
-    return Ok;
-  return Undefined;
+  std::lock_guard<std::mutex> lock(accessMutex);
+  return optimal.has_value() ? Ok : Undefined;
 }
 
 ResultCode ServerProvider::workerThread() {
@@ -112,7 +112,9 @@ void ServerProvider::chooseOptimal() {
 
   std::optional<std::string> newOptimal;
   try {
-    // potential very expensive methods
+    // TODO: emulate potential very expensive methods
+    std::this_thread::sleep_for(chooseOptimalTime);
+
     if (curSettings.searchMode == Local)
       newOptimal = searchLocal(
           oldOptimal, curSettings.localSearchSettings, curSettings.servers);
@@ -126,8 +128,7 @@ void ServerProvider::chooseOptimal() {
   }
 
   lck.lock();
-  if (not changeSettings.load())
-    optimal = std::move(newOptimal);
+  optimal = std::move(newOptimal);
   // for repeat try immediately
   if (not optimal.has_value())
     changeSettings.store(true);

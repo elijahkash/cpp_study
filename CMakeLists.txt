@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(cpp_study LANGUAGES C CXX)
 
-#set(CMAKE_CXX_COMPILER g++-10)
+set(CMAKE_CXX_COMPILER g++-10)
+#set(CMAKE_CXX_COMPILER clang++)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
@@ -31,7 +32,7 @@ add_compile_options(${GENERAL_FLAGS})
 #add_compile_definitions(AUTOUIC)
 #
 #find_package(Qt5 COMPONENTS Widgets REQUIRED)
-#find_package(Threads REQUIRED)
+find_package(Threads REQUIRED)
 
 set(SRC_DIR ${PROJECT_SOURCE_DIR}/)
 
@@ -48,14 +49,14 @@ set(SRC
 # for develop exclude from default build!
 add_executable(hello EXCLUDE_FROM_ALL ${SRC})
 target_compile_options(hello PRIVATE ${RELEASE_FLAGS})
+target_link_libraries(hello PRIVATE Threads::Threads)
 #target_link_libraries(cpp_study PRIVATE Qt5::Widgets)
-#target_link_libraries(cpp_study PRIVATE Threads::Threads)
 
 # DEBUG build
 add_executable(hello_debug ${SRC})
 target_compile_options(hello_debug PRIVATE ${DEBUG_FLAGS})
+target_link_libraries(hello_debug PRIVATE Threads::Threads)
 #target_link_libraries(3DEngine_debug PRIVATE Qt5::Widgets)
-#target_link_libraries(3DEngine_debug PRIVATE Threads::Threads)
 #target_link_libraries(3DEngine_debug PRIVATE SDL2)
 #
 #target_include_directories(3DEngine_debug PRIVATE ${SDL2_INCLUDE_DIRS})
