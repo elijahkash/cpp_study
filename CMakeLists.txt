@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 #set(CMAKE_VERBOSE_MAKEFILE on)
 
+add_subdirectory(TopSystem/case_1/)
+
 project(cpp_study LANGUAGES C CXX)
 
 set(CMAKE_CXX_COMPILER g++-10)
