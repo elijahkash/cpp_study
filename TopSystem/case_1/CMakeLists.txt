@@ -12,4 +12,4 @@ set(TEST_SRC
    )
 
 add_executable(case_1 ${TEST_SRC})
-
+target_link_libraries(case_1 PRIVATE Catch2::Catch2)

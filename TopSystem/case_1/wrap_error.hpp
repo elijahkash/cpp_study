@@ -5,11 +5,6 @@
 #include <list>
 #include <string>
 
-// tested on:
-//  - Apple clang version 11.0.0 (clang-1100.0.33.17)
-//  - g++-10 (10.2.0)
-// C++17
-
 template<typename T>
 class WrapError {
  public:
@@ -106,11 +101,13 @@ bool WrapError<T>::hasError() const noexcept {
 
 template<typename T>
 T& WrapError<T>::operator()() noexcept {
+  // is hasError - undefined behavior (NULL-pointer dereference)
   return *std::get_if<T>(&value);
 }
 
 template<typename T>
 std::list<std::string>& WrapError<T>::getErrors() noexcept {
+  // is hasValue - undefined behavior (NULL-pointer dereference)
   return *std::get_if<std::list<std::string>>(&value);
 }
 
