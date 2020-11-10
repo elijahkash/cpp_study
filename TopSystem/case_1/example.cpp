@@ -122,5 +122,5 @@ void PrintTaskResult(
   // {
   //   print_exception(ex);
   // }
-  std::cout << std::endl << std::endl;
+  // std::cout << std::endl << std::endl;
 }

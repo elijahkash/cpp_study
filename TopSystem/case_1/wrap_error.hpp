@@ -7,7 +7,7 @@
 
 // tested on:
 //  - Apple clang version 11.0.0 (clang-1100.0.33.17)
-//  - g++-10 (Homebrew GCC 10.2.0) 10.2.0
+//  - g++-10 (10.2.0)
 // C++17
 
 template<typename T>
@@ -16,13 +16,19 @@ class WrapError {
   // Constructors can't be marked as noexcept:
   //  - constructor T may throw
   //  - std::bad_alloc in std::list and std::string
-  explicit WrapError(T& val);
+
+  // store value without error
+  explicit WrapError(const T& val);
   explicit WrapError(T&& val);
-  explicit WrapError(std::string& error);
+  // store single error
+  explicit WrapError(const std::string& error);
   explicit WrapError(std::string&& error);
-  explicit WrapError(std::list<std::string>& nested);
+  // inherit nested errors from existing WrapError (WrapError::getErrors())
+  explicit WrapError(const std::list<std::string>& nested);
   explicit WrapError(std::list<std::string>&& nested);
-  WrapError(std::string& error, std::list<std::string>& nested);
+  // inherit nested errors from existing WrapError (WrapError::getErrors())
+  // and add new error (to errors list head)
+  WrapError(const std::string& error, const std::list<std::string>& nested);
   WrapError(std::string&& error, std::list<std::string>&& nested);
 
   explicit operator bool() const noexcept;
@@ -39,7 +45,7 @@ class WrapError {
 };
 
 template<typename T>
-WrapError<T>::WrapError(T& val)
+WrapError<T>::WrapError(const T& val)
   : value(val)  {
 }
 
@@ -49,7 +55,7 @@ WrapError<T>::WrapError(T&& val)
 }
 
 template<typename T>
-WrapError<T>::WrapError(std::string& error)
+WrapError<T>::WrapError(const std::string& error)
   : value(std::list<std::string>()) {
   (std::get_if<std::list<std::string>>(&value))->emplace_front(error);
 }
@@ -61,7 +67,8 @@ WrapError<T>::WrapError(std::string&& error)
 }
 
 template<typename T>
-WrapError<T>::WrapError(std::string& error, std::list<std::string>& nested)
+WrapError<T>::WrapError(const std::string& error,
+                        const std::list<std::string>& nested)
   : value(nested) {
   (std::get_if<std::list<std::string>>(&value))->emplace_front(error);
 }
@@ -73,7 +80,7 @@ WrapError<T>::WrapError(std::string&& error, std::list<std::string>&& nested)
 }
 
 template<typename T>
-WrapError<T>::WrapError(std::list<std::string>& nested)
+WrapError<T>::WrapError(const std::list<std::string>& nested)
   : value(nested) {
 }
 
