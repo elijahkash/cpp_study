@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 #set(CMAKE_VERBOSE_MAKEFILE on)
 
 add_subdirectory(TopSystem/case_1/)
+add_subdirectory(TopSystem/case_2/)
 add_subdirectory(TopSystem/case_3/)
 
 project(cpp_study LANGUAGES C CXX)
