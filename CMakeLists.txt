@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 add_subdirectory(TopSystem/case_1/)
 add_subdirectory(TopSystem/case_2/)
 add_subdirectory(TopSystem/case_3/)
+add_subdirectory(TopSystem/test_task/)
 
 project(cpp_study LANGUAGES C CXX)
 
