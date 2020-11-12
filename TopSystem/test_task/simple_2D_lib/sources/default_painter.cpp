@@ -70,4 +70,34 @@ void DefaultPainter::setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const {
   }
 }
 
+// TODO: int's (signed <-> unsigned)
+void DefaultPainter::setCirclePixels(glm::i32vec2 center,
+                                     int32_t radius) const {
+  int32_t x = 0;
+  int32_t y = radius;
+  int32_t delta = 1 - 2 * radius;
+  int32_t error = 0;
+  while(y >= 0) {
+    setPixel({center.x + x, center.y + y});
+    setPixel({center.x + x, center.y - y});
+    setPixel({center.x - x, center.y + y});
+    setPixel({center.x - x, center.y - y});
+    error = 2 * (delta + y) - 1;
+    if(delta < 0 && error <= 0) {
+      x++;
+      delta += 2 * x + 1;
+      continue;
+    }
+    error = 2 * (delta - x) - 1;
+    if(delta > 0 && error > 0) {
+      y--;
+      delta += 1 - 2 * y;
+      continue;
+    }
+    x++;
+    delta += 2 * (x - y);
+    y--;
+  }
+}
+
 }  // simple_2d_lib

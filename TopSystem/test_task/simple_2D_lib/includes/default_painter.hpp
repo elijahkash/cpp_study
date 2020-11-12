@@ -14,16 +14,17 @@ class DefaultPainter : public Painter {
 
   void updateBuf(std::shared_ptr<Color[]> newBuf);
 
+  void setPixel(glm::i32vec2 coords) const override;
   void clear() const override;
 
  private:
   uint32_t width;
   uint32_t height;
-  std::shared_ptr<Color[]> buf;
 
-  void setPixel(glm::i32vec2 coords) const override;
+  std::shared_ptr<Color[]> buf;
   void setPointPixels(glm::i32vec2 pos) const override;
   void setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const override;
+  void setCirclePixels(glm::i32vec2 center, int32_t radius) const override;
 };
 
 }  // simple_2d_lib

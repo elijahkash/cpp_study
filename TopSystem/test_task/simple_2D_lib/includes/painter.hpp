@@ -8,32 +8,40 @@
 
 namespace simple_2d_lib {
 
-class Painter {
- public: // methods
-  Painter();
+static glm::i32vec2 normalize(glm::fvec2 coords);
+
+class PaintEngine {
+ public:
+  PaintEngine();
 
   virtual void setPixel(glm::i32vec2 coords) const = 0;
+  virtual void clear() const = 0;
+
+  void setClearColor(Color newClearColor);
+  void setPenColor(Color newPenColor);
+
+ protected:
+  Color clearColor;
+  Color penColor;
+};
+
+class Painter : public PaintEngine {
+ public: // methods
+  Painter() = default;
 
   void drawPoint(glm::fvec2 pos) const;
   void drawLine(glm::fvec2 start, glm::fvec2 end) const;
+  void drawCircle(glm::fvec2 center, glm::fvec2 radius) const;
 
-  virtual void clear() const = 0;
-  void setClearColor(Color newClearColor);
 
-  void setPenColor(Color newPenColor);
  public: // properties
-
   VertexShader vertexShader;
- protected:
-  Color clearColor;
 
-  Color penColor;
+ protected:
+
   virtual void setPointPixels(glm::i32vec2 pos) const = 0;
   virtual void setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const = 0;
-
- private:
-  // TODO: remove from class?
-  static glm::i32vec2 normalize(glm::fvec2 coords);
+  virtual void setCirclePixels(glm::i32vec2 center, int32_t radius) const = 0;
 };
 
 }  // simple_2d_lib

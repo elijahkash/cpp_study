@@ -54,6 +54,10 @@ std::vector<std::unique_ptr<simple_2d_lib::Shape>> createItems() {
   res.emplace_back(std::make_unique<simple_2d_lib::Triangle>(
       point1, point2, point3));
 
+  point1 = {200, 0};
+  point2 = {20, 0};
+  res.emplace_back(std::make_unique<simple_2d_lib::Circle>(point1, point2));
+
   return std::move(res);
 }
 
