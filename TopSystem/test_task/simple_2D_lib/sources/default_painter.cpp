@@ -48,6 +48,7 @@ void DefaultPainter::setPointPixels(glm::i32vec2 pos) const {
   setPixel({pos.x - 1, pos.y - 1});
 }
 
+// TODO: clipping
 void DefaultPainter::setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const {
   const int32_t deltaX = abs(end.x - start.x);
   const int32_t deltaY = abs(end.y - start.y);

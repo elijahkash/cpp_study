@@ -24,7 +24,7 @@ void Camera2D::setScale(float newScale) noexcept {
 
 void Camera2D::setRoll(float newRoll) noexcept {
   roll = newRoll;
-  roll = std::fmod(roll, 180);
+  roll = std::fmod(roll, 360);
 }
 
 void Camera2D::move(glm::fvec2 biasPos) noexcept {
@@ -33,7 +33,7 @@ void Camera2D::move(glm::fvec2 biasPos) noexcept {
 
 void Camera2D::rotate(float biasRoll) noexcept {
   roll += biasRoll;
-  roll = std::fmod(roll, 180);
+  roll = std::fmod(roll, 360);
 }
 
 glm::fvec2 Camera2D::getPos() const noexcept {

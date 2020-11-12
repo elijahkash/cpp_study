@@ -33,6 +33,8 @@ std::vector<std::unique_ptr<simple_2d_lib::Shape>> createItems() {
   res.emplace_back(std::make_unique<simple_2d_lib::Point>(point1));
   res.emplace_back(std::make_unique<simple_2d_lib::Point>(point2));
   res.emplace_back(std::make_unique<simple_2d_lib::Point>(point3));
+  point3 = {-20, 20};
+  res.emplace_back(std::make_unique<simple_2d_lib::Point>(point3));
 
   point1 = {-100, 0};
   point2 = {100, 0};

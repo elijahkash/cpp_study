@@ -40,6 +40,17 @@ class Triangle : public Shape {
   glm::fvec2 point3;
 };
 
+class Circle : public Shape {
+ public:
+  Circle(glm::fvec2 center, glm::fvec2 radius);
+
+  void draw(Painter *painter) const override;
+
+ protected:
+  glm::fvec2 center;
+  glm::fvec2 radius;
+};
+
 }  // simple_2d_lib
 
 #endif  // TEST_TASK_SIMPLE_2D_LIB_INCLUDES_DEFAULT_SHAPES_HPP_

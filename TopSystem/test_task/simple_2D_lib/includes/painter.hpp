@@ -12,21 +12,22 @@ class Painter {
  public: // methods
   Painter();
 
+  virtual void setPixel(glm::i32vec2 coords) const = 0;
+
   void drawPoint(glm::fvec2 pos) const;
   void drawLine(glm::fvec2 start, glm::fvec2 end) const;
+
   virtual void clear() const = 0;
-
   void setClearColor(Color newClearColor);
+
   void setPenColor(Color newPenColor);
-
  public: // properties
-  VertexShader vertexShader;
 
+  VertexShader vertexShader;
  protected:
   Color clearColor;
-  Color penColor;
 
-  virtual void setPixel(glm::i32vec2 coords) const = 0;
+  Color penColor;
   virtual void setPointPixels(glm::i32vec2 pos) const = 0;
   virtual void setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const = 0;
 
