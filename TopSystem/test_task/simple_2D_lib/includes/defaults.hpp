@@ -3,10 +3,14 @@
 
 #include <cstdint>
 
+#include "color.hpp"
 
 const int32_t DEFAULT_CAMERA_X = 0;
 const int32_t DEFAULT_CAMERA_Y = 0;
 const uint32_t DEFAULT_CAMERA_SCALE = 1;
 const uint32_t DEFAULT_CAMERA_ROLL = 0;
+
+const Color DEFAULT_PAINTER_CLEAR_COLOR(255, 255, 255);
+const Color DEFAULT_PAINTER_PEN_COLOR(0, 0, 0);
 
 #endif  // TEST_TASK_SIMPLE_2D_LIB_INCLUDES_DEFAULTS_HPP_
