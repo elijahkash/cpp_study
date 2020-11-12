@@ -1,13 +1,10 @@
 #include <SDL2/SDL.h>
 
-
 #include <iostream>
-#include <array>
 
 #include "engine.hpp"
 #include "default_painter.hpp"
-
-#include "default_shapes/line.hpp"
+#include "default_shapes.hpp"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -18,42 +15,45 @@ int shift = (req_format == STBI_rgb) ? 8 : 0;
   gmask = 0x00ff0000 >> shift;
   bmask = 0x0000ff00 >> shift;
 #else // little endian, like x86
-unsigned rmask = 0x000000ff;
-unsigned gmask = 0x0000ff00;
-unsigned bmask = 0x00ff0000;
+  unsigned rmask = 0x000000ff;
+  unsigned gmask = 0x0000ff00;
+  unsigned bmask = 0x00ff0000;
 #endif
 
-/*class Foo final : public FrameExporter {
- public:
-  explicit Foo(SDL_Window* window)
-      : window(window), screen_surface(SDL_GetWindowSurface(window)) {}
+std::vector<std::unique_ptr<simple_2d_lib::Shape>> createItems() {
+  std::vector<std::unique_ptr<simple_2d_lib::Shape>> res;
 
-  void imageExportEvent(
-      std::unique_ptr<const PoolOfSurfaces::ExportingSurface> surf) final {
+  glm::fvec2 point1;
+  glm::fvec2 point2;
+  glm::fvec2 point3;
 
-    SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
-        (void*)surf->data().data(), SCREEN_WIDTH, SCREEN_HEIGHT,
-        24, 3 * SCREEN_WIDTH, rmask, gmask, bmask, 0);
+  point1 = {0, 0};
+  point2 = {50, 50};
+  point3 = {-50, -50};
+  res.emplace_back(std::make_unique<simple_2d_lib::Point>(point1));
+  res.emplace_back(std::make_unique<simple_2d_lib::Point>(point2));
+  res.emplace_back(std::make_unique<simple_2d_lib::Point>(point3));
 
-    if (surface == nullptr) {
-      std::cout << "Creating surface failed!";
-      exit(1);
-    }
+  point1 = {-100, 0};
+  point2 = {100, 0};
+  res.emplace_back(std::make_unique<simple_2d_lib::Line>(point1, point2));
 
-    SDL_BlitSurface(surface, nullptr, screen_surface, nullptr);
+  point1 = {0, -100};
+  point2 = {0, 100};
+  res.emplace_back(std::make_unique<simple_2d_lib::Line>(point1, point2));
 
-    SDL_UpdateWindowSurface(window);
-    static int counter = 0;
-    // frames count
-    // if (counter++ % 50 == 0)
-    //   std::cout << counter << '\n';
-    // SDL_Delay(20);
-  }
+  point1 = {-70, 10};
+  point2 = {-20, 150};
+  res.emplace_back(std::make_unique<simple_2d_lib::Line>(point1, point2));
 
- private:
-  SDL_Window* window;
-  SDL_Surface* screen_surface;
-};*/
+  point1 = {50, -20};
+  point2 = {20, -75};
+  point3 = {80, -75};
+  res.emplace_back(std::make_unique<simple_2d_lib::Triangle>(
+      point1, point2, point3));
+
+  return std::move(res);
+}
 
 int main (int argc, char** argv) {
   // TODO: not every!
@@ -65,7 +65,7 @@ int main (int argc, char** argv) {
   // SDL_Surface* screen_surface = nullptr;
   SDL_Window* window = nullptr;
 
-  window = SDL_CreateWindow("Hello, SDL 2!", SDL_WINDOWPOS_CENTERED,
+  window = SDL_CreateWindow("DEMO_APP", SDL_WINDOWPOS_CENTERED,
                             SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
                             SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
   if (window == nullptr) {
@@ -74,17 +74,24 @@ int main (int argc, char** argv) {
   }
   SDL_UpdateWindowSurface(window);
 
-  std::shared_ptr<Color[]> buf(new Color[SCREEN_WIDTH * SCREEN_HEIGHT]);
-  DefaultPainter painter(SCREEN_WIDTH, SCREEN_HEIGHT, buf);
-  Engine engine(&painter);
+  std::shared_ptr<Color[]> buf1(new Color[SCREEN_WIDTH * SCREEN_HEIGHT]);
+  std::shared_ptr<Color[]> buf2(new Color[SCREEN_WIDTH * SCREEN_HEIGHT]);
 
-  std::array<glm::fvec2, 2> test{};
-  test[0] = {10, 10};
-  test[0] = {50, 50};
+  simple_2d_lib::DefaultPainter painter(SCREEN_WIDTH, SCREEN_HEIGHT, buf1);
+  simple_2d_lib::Engine engine(&painter);
 
-  engine.addShape(std::make_unique<Line>(test[0], test[1]));
+  engine.items = createItems();
 
+  engine.drawFrame();
 
+  SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
+      (void*)buf1.get(), SCREEN_WIDTH, SCREEN_HEIGHT,
+      24, 3 * SCREEN_WIDTH, rmask, gmask, bmask, 0);
+  SDL_BlitSurface(surface, nullptr, SDL_GetWindowSurface(window), nullptr);
+  SDL_UpdateWindowSurface(window);
+
+  painter.updateBuf(buf2);
+  int i = 2;
 
   bool quit = false;
   SDL_Event e;
@@ -97,18 +104,24 @@ int main (int argc, char** argv) {
         // SDL_GetKeyName(e.key.keysym.sym) << std::endl;
         switch (e.key.keysym.scancode) {
           case 80:  // left
-            engine.camera.move({-1, 0});
+            engine.camera.move({-20, 0});
             break;
           case 79:  // right
-            engine.camera.move({1, 0});
+            engine.camera.move({20, 0});
             break;
           case 81:  // down
-            engine.camera.move({0, -1});
+            engine.camera.move({0, -20});
             break;
           case 82:  // up
-            engine.camera.move({0, 1});
+            engine.camera.move({0, 20});
             break;
 
+          case 22:  // S
+            engine.camera.setScale(engine.camera.getScale() - 1);
+            break;
+          case 26:  // W
+            engine.camera.setScale(engine.camera.getScale() + 1);
+            break;
           case 20:  // Q
             engine.camera.rotate(1);
             break;
@@ -116,23 +129,35 @@ int main (int argc, char** argv) {
             engine.camera.rotate(-1);
             break;
         }
+
+        engine.drawFrame();
+
+        if (i == 2) {
+          surface = SDL_CreateRGBSurfaceFrom(
+              (void *) buf2.get(), SCREEN_WIDTH, SCREEN_HEIGHT,
+              24, 3 * SCREEN_WIDTH, rmask, gmask, bmask, 0);
+          i = 1;
+        } else {
+          surface = SDL_CreateRGBSurfaceFrom(
+              (void *) buf1.get(), SCREEN_WIDTH, SCREEN_HEIGHT,
+              24, 3 * SCREEN_WIDTH, rmask, gmask, bmask, 0);
+          i = 2;
+        }
+
+        if (surface == nullptr) {
+          std::cout << "Creating surface failed!";
+          exit(1);
+        }
+
+        SDL_BlitSurface(surface, nullptr,
+                        SDL_GetWindowSurface(window), nullptr);
+        SDL_UpdateWindowSurface(window);
+
+        if (i == 1)
+          painter.updateBuf(buf1);
+        else
+          painter.updateBuf(buf2);
       }
-
-      engine.drawFrame();
-
-      SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
-          (void*)buf.get(), SCREEN_WIDTH, SCREEN_HEIGHT,
-          24, 3 * SCREEN_WIDTH, rmask, gmask, bmask, 0);
-
-      if (surface == nullptr) {
-        std::cout << "Creating surface failed!";
-        exit(1);
-      }
-
-      SDL_BlitSurface(surface, nullptr, SDL_GetWindowSurface(window), nullptr);
-
-      SDL_UpdateWindowSurface(window);
-
     }
   }
 

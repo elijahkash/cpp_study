@@ -6,20 +6,26 @@
 #include "painter.hpp"
 #include "color.hpp"
 
+namespace simple_2d_lib {
+
 class DefaultPainter : public Painter {
  public:
   DefaultPainter(uint32_t width, uint32_t height, std::shared_ptr<Color[]> buf);
 
-  void clear() override;
+  void updateBuf(std::shared_ptr<Color[]> newBuf);
+
+  void clear() const override;
 
  private:
   uint32_t width;
   uint32_t height;
   std::shared_ptr<Color[]> buf;
 
-  void setPixel(glm::i32vec2 coords) override;
-  void setPointPixels(glm::i32vec2 pos) override;
-  void setLinePixels(glm::i32vec2 start, glm::i32vec2 end) override;
+  void setPixel(glm::i32vec2 coords) const override;
+  void setPointPixels(glm::i32vec2 pos) const override;
+  void setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const override;
 };
+
+}  // simple_2d_lib
 
 #endif // TEST_TASK_SIMPLE_2D_LIB_INCLUDES_DEFAULT_PAINTER_HPP_

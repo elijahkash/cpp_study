@@ -5,8 +5,8 @@
 
 #include "color.hpp"
 
-const int32_t DEFAULT_CAMERA_X = 0;
-const int32_t DEFAULT_CAMERA_Y = 0;
+const int32_t DEFAULT_CAMERA_X = 200;
+const int32_t DEFAULT_CAMERA_Y = -200;
 const uint32_t DEFAULT_CAMERA_SCALE = 1;
 const uint32_t DEFAULT_CAMERA_ROLL = 0;
 

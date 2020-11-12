@@ -6,6 +6,8 @@
 
 #include "defaults.hpp"
 
+namespace simple_2d_lib {
+
 Camera2D::Camera2D()
   : pos(DEFAULT_CAMERA_X, DEFAULT_CAMERA_Y)
   , scale(DEFAULT_CAMERA_SCALE)
@@ -47,9 +49,11 @@ float Camera2D::getRoll() const noexcept {
 }
 
 glm::fmat3 Camera2D::getViewMatrix() const noexcept {
-  glm::fmat3 modelView(1.0);
-  modelView = glm::scale(modelView, glm::fvec2(scale));
-  modelView = glm::rotate(modelView, glm::radians<float>(roll));
-  modelView = glm::translate(modelView, pos);
-  return modelView;
+  glm::fmat3 viewMatrix(1.0);
+  viewMatrix = glm::translate(viewMatrix, pos);
+  viewMatrix = glm::scale(viewMatrix, glm::fvec2(scale));
+  viewMatrix = glm::rotate(viewMatrix, glm::radians<float>(roll));
+  return viewMatrix;
 }
+
+}  // simple_2d_lib

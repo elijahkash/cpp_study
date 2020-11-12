@@ -2,6 +2,8 @@
 
 #include <utility>
 
+namespace simple_2d_lib {
+
 DefaultPainter::DefaultPainter(uint32_t width,
                                uint32_t height,
                                std::shared_ptr<Color[]> buf)
@@ -10,19 +12,24 @@ DefaultPainter::DefaultPainter(uint32_t width,
   , buf(std::move(buf)) {
 }
 
-void DefaultPainter::clear() {
+void DefaultPainter::updateBuf(std::shared_ptr<Color[]> newBuf) {
+  buf = std::move(newBuf);
+}
+
+void DefaultPainter::clear() const {
   uint32_t size = width * height;
   for (uint32_t i = 0; i < size; i++)
     buf[i] = clearColor;
 }
 
-void DefaultPainter::setPixel(glm::i32vec2 coords) {
+void DefaultPainter::setPixel(glm::i32vec2 coords) const {
+  coords.y *= -1;
   if (coords.x >= 0 and coords.x < width
       and coords.y >= 0 and coords.y < height)
     buf[coords.y * width + coords.x] = penColor;
 }
 
-void DefaultPainter::setPointPixels(glm::i32vec2 pos) {
+void DefaultPainter::setPointPixels(glm::i32vec2 pos) const {
   setPixel(pos);
 
   setPixel({pos.x + 1, pos.y});
@@ -41,7 +48,7 @@ void DefaultPainter::setPointPixels(glm::i32vec2 pos) {
   setPixel({pos.x - 1, pos.y - 1});
 }
 
-void DefaultPainter::setLinePixels(glm::i32vec2 start, glm::i32vec2 end) {
+void DefaultPainter::setLinePixels(glm::i32vec2 start, glm::i32vec2 end) const {
   const int32_t deltaX = abs(end.x - start.x);
   const int32_t deltaY = abs(end.y - start.y);
   const int32_t signX = start.x < end.x ? 1 : -1;
@@ -61,3 +68,5 @@ void DefaultPainter::setLinePixels(glm::i32vec2 start, glm::i32vec2 end) {
     }
   }
 }
+
+}  // simple_2d_lib

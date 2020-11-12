@@ -1,17 +1,16 @@
 #include "engine.hpp"
 
-#include <utility>
+namespace simple_2d_lib {
 
 Engine::Engine(Painter *painter)
- : painter(painter) {
+    : painter(painter) {
 }
 
 void Engine::drawFrame() {
   painter->clear();
+  painter->vertexShader.setViewMatrix(camera.getViewMatrix());
   for (const auto& item : items)
     item->draw(painter);
 }
 
-void Engine::addShape(std::unique_ptr<Shape> newShape) {
-  items.emplace_back(std::move(newShape));
-}
+}  // simple_2d_lib

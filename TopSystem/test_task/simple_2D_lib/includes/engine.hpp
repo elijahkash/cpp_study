@@ -5,14 +5,11 @@
 #include <memory>
 #include <vector>
 
-// TODO: need?
-#include <glm/glm.hpp>
-
 #include "camera.hpp"
 #include "painter.hpp"
 #include "shape.hpp"
 
-// namespace simple_2d_lib {
+namespace simple_2d_lib {
 
 class Engine {
  public:  // methods
@@ -25,17 +22,14 @@ class Engine {
 
   void drawFrame();
 
-  // TODO: not okay!
-  void addShape(std::unique_ptr<Shape> newShape);
-
  public:  // properties
   Camera2D camera;
-
- private: // properties
-  Painter* painter;
   std::vector<std::unique_ptr<Shape>> items;
+
+ private:
+  Painter* painter;
 };
 
-// }  // simple_2d_lib
+}  // simple_2d_lib
 
 #endif  // TEST_TASK_SIMPLE_2D_LIB_INCLUDES_ENGINE_HPP_

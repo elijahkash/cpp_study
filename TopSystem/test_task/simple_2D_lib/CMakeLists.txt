@@ -9,13 +9,11 @@ find_package(glm REQUIRED)
 set(LIB_SRC
     ${PROJECT_SOURCE_DIR}/sources/engine.cpp
     ${PROJECT_SOURCE_DIR}/sources/camera.cpp
-    ${PROJECT_SOURCE_DIR}/sources/shape.cpp
     ${PROJECT_SOURCE_DIR}/sources/painter.cpp
-    ${PROJECT_SOURCE_DIR}/sources/default_painter.cpp
-    ${PROJECT_SOURCE_DIR}/sources/color.cpp
     ${PROJECT_SOURCE_DIR}/sources/vertex_shader.cpp
-    
-    ${PROJECT_SOURCE_DIR}/sources/default_shapes/line.cpp
+    ${PROJECT_SOURCE_DIR}/sources/color.cpp
+    ${PROJECT_SOURCE_DIR}/sources/default_painter.cpp
+    ${PROJECT_SOURCE_DIR}/sources/default_shapes.cpp
     )
 
 add_library(simple_2D_lib ${LIB_SRC})

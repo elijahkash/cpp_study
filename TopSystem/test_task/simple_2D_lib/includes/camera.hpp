@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+namespace simple_2d_lib {
+
 // TODO: protect from integers overflow!
 class Camera2D {
  public:
@@ -30,5 +32,7 @@ class Camera2D {
   // degrees
   float roll;
 };
+
+}  // simple_2d_lib
 
 #endif  // TEST_TASK_SIMPLE_2D_LIB_INCLUDES_CAMERA_HPP_
